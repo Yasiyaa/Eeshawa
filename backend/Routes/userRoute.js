@@ -1,34 +1,33 @@
 const express = require("express");
 const router = express.Router();
-const CIService = require("../Services/userService");
+const userService = require("../Services/userService");
 
 router
-  .route("/user")
+  .route("/user/authenticate")
 
-  // Get all  inquiry
-  .get(function (req, res) {
-    const inquiryService = CIService.getCustomerInqueriesInstance();
-    const result = inquiryService.getAllData();
-    result.then((data) => res.send(data)).catch((err) => console.log(err));
-
-    // res.send(data);
-  })
-
-  // Create new inquiry
+  // authenticate user
   .post(function (req, res) {
-    const { cusid, type, inquiry, status } = req.body;
-    const inquiryService = CIService.getCustomerInqueriesInstance();
+    const { email, password } = req.body;
+    const uService = userService.getCustomerInstance();
 
-    const result = inquiryService.insertNewQuery(cusid, type, inquiry, status);
+    const result = uService.authenticate(email, password);
 
-    result
-      .then((data) => res.json({ data: data }))
-      .catch((err) => {
-        console.log(err);
-        res
-          .status(500)
-          .json({ error: "An error occurred while inserting the customer." });
-      });
+    result.then((data) => res.send(data)).catch((err) => console.log(err));
   });
+
+
+
+  router
+  .route("/user/sign-up")
+  // signup new user
+  .post(function (req, res) {
+    const { fname,lname,email,telephone,nic,city,password } = req.body;
+    const uService = userService.getCustomerInstance();
+
+    const result = uService.insertNewCustomer( fname,lname,email,telephone,nic,city,password );
+
+    result.then((data) => res.send(data)).catch((err) => console.log(err));
+  });
+
 
 module.exports = router;
